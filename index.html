@@ -8,21 +8,29 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;700;900&display=swap');
-        body { background: #0b0f19; color: #e2e8f0; font-family: 'Inter', sans-serif; }
-        .glass-panel { background: rgba(17, 24, 39, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
-        .terminal { font-family: 'JetBrains Mono', monospace; background: #010409; border: 1px solid #30363d; }
+        body { background: #0b121f; color: #e2e8f0; font-family: 'Inter', sans-serif; }
+        .glass-panel { background: rgba(17, 25, 40, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
         
+        /* FIX TRIỆT ĐỂ Ô TRẮNG */
         .select-custom { 
             appearance: none;
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2306b6d4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
             background-repeat: no-repeat;
             background-position: right 1rem center;
             background-size: 1em;
-            @apply w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm text-cyan-400 outline-none transition-all cursor-pointer hover:border-cyan-500 shadow-inner;
+            background-color: #020617; /* Ép nền cực tối */
+            @apply w-full border border-slate-800 rounded-2xl p-4 text-sm text-cyan-400 outline-none transition-all cursor-pointer hover:border-cyan-500 shadow-inner;
         }
-        .select-custom option { background-color: #0b0f19; color: #22d3ee; }
+
+        /* Ép màu cho danh sách xổ xuống - Đây là phần quan trọng nhất */
+        .select-custom option { 
+            background-color: #0f172a !important; /* Màu nền của các lựa chọn */
+            color: #22d3ee !important; /* Màu chữ của các lựa chọn */
+            padding: 12px;
+        }
 
         .neon-glow { text-shadow: 0 0 15px rgba(6, 182, 212, 0.6); }
+        .terminal { font-family: 'JetBrains Mono', monospace; background: #010409; border: 1px solid #1e293b; }
         #serial-log::-webkit-scrollbar { width: 4px; }
         #serial-log::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 10px; }
     </style>
@@ -32,7 +40,7 @@
     <div class="max-w-6xl mx-auto w-full">
         <div class="flex flex-col md:flex-row justify-between items-center mb-12 gap-6 border-b border-slate-800 pb-10">
             <div class="text-center md:text-left">
-                <h1 class="text-6xl font-black text-cyan-500 tracking-tighter italic neon-glow uppercase">VIETHUD <span class="text-white text-4xl block md:inline">PROJECT</span></h1>
+                <h1 class="text-6xl font-black text-cyan-500 tracking-tighter italic neon-glow uppercase leading-none">VIETHUD <span class="text-white text-4xl block md:inline">PROJECT</span></h1>
                 <p class="text-slate-500 mt-3 font-mono uppercase tracking-[0.3em] text-[10px]">Professional Firmware Management v1.0.1</p>
             </div>
             
@@ -44,22 +52,20 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
-            
             <div class="lg:col-span-6">
                 <div class="glass-panel rounded-[2.5rem] p-10 shadow-2xl border border-cyan-500/10 h-full">
                     <div class="flex justify-between items-center mb-10">
                         <h2 class="text-2xl font-black text-white uppercase tracking-tighter flex items-center gap-3">
-                            <span class="w-8 h-1 bg-cyan-500"></span> HUD CONFIG
+                            <span class="w-8 h-1 bg-cyan-500 text-xs"></span> HUD CONFIG
                         </h2>
-                        <div id="status-badge" class="flex items-center gap-2 px-3 py-1 bg-red-500/10 border border-red-500/20 rounded-full">
+                        <div id="status-badge" class="flex items-center gap-2 px-3 py-1 bg-red-500/10 border border-red-500/20 rounded-full transition-all">
                             <span id="status-dot" class="w-2 h-2 rounded-full bg-red-500"></span>
                             <span id="status-text" class="text-[10px] font-bold text-red-500 uppercase tracking-widest">Disconnected</span>
                         </div>
                     </div>
                     
                     <div class="space-y-6">
-                        <button id="btn-connect" onclick="initSerial()" class="w-full bg-slate-900 border border-slate-800 hover:border-cyan-500 text-cyan-400 font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-3 group">
-                            <i id="connect-icon" class="fas fa-plug group-hover:animate-pulse"></i>
+                        <button id="btn-connect" onclick="initSerial()" class="w-full bg-slate-950 border border-slate-800 hover:border-cyan-500 text-cyan-400 font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-3 group shadow-xl">
                             <span id="connect-btn-text" class="uppercase text-xs tracking-widest">Connect Serial Device</span>
                         </button>
 
@@ -175,9 +181,7 @@
         }
 
         async function sendCmd(c) {
-            if (!port) {
-                await initSerial();
-            }
+            if (!port) { await initSerial(); }
             if (port && port.writable) {
                 const writer = port.writable.getWriter();
                 await writer.write(new TextEncoder().encode(c + "\n"));
