@@ -14,7 +14,6 @@
         .glass-card:hover { border-color: rgba(6, 182, 212, 0.3); }
         .neon-glow { text-shadow: 0 0 15px rgba(6, 182, 212, 0.6); }
         
-        /* Dropdown Pro - Fix đè thẻ */
         .custom-select-container { position: relative; width: 100%; z-index: 50; }
         .selected-box { 
             @apply w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-cyan-400 cursor-pointer flex justify-between items-center transition-all hover:border-cyan-500 shadow-inner;
@@ -40,11 +39,11 @@
     <div class="max-w-6xl mx-auto w-full">
         <div class="flex flex-col md:flex-row justify-between items-center mb-12 gap-6 border-b border-slate-800 pb-10">
             <div class="text-center md:text-left">
-                <h1 class="text-5xl font-black text-cyan-500 tracking-tighter italic neon-glow uppercase">VIETHUD <span class="text-white text-3xl block md:inline text-">PROJECT</span></h1>
+                <h1 class="text-5xl font-black text-cyan-500 tracking-tighter italic neon-glow uppercase">VIETHUD <span class="text-white text-3xl block md:inline">PROJECT</span></h1>
                 <p class="text-slate-500 mt-3 font-mono uppercase tracking-[0.3em] text-[10px]">Professional Firmware Management v1.0.1</p>
             </div>
             <esp-web-install-button manifest="./manifest.json">
-                <button slot="activate" class="bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-black py-4 px-10 rounded-xl shadow-xl transition-all active:scale-95 text-[10px] uppercase tracking-widest">FLASH FIRMWARE</button>
+                <button slot="activate" class="bg-cyan-600 hover:bg-cyan-400 text-slate-950 font-black py-4 px-10 rounded-xl shadow-xl transition-all active:scale-95 text-[10px] uppercase tracking-widest">FLASH FIRMWARE</button>
             </esp-web-install-button>
         </div>
 
@@ -54,7 +53,7 @@
                 <div class="glass-card rounded-2xl p-6 flex items-center justify-between border-l-4 border-l-red-500" id="status-card">
                     <div class="flex items-center gap-4 text-xs font-bold uppercase tracking-widest">
                         <div id="status-dot" class="w-3 h-3 rounded-full bg-red-500 animate-pulse"></div>
-                        <span id="status-text" class="text-red-500">Thiết bị chưa kết nối</span>
+                        <span id="status-text" class="text-red-500 font-extrabold">Thiết bị chưa kết nối</span>
                     </div>
                     <button onclick="initSerial()" class="text-cyan-400 border border-cyan-500/30 px-4 py-2 rounded-lg text-[10px] font-bold uppercase hover:bg-cyan-500/10 transition-all">Kết nối Serial</button>
                 </div>
@@ -84,8 +83,8 @@
                 </div>
 
                 <div class="glass-card rounded-2xl p-6" style="z-index: 90;">
-                    <h3 class="text-cyan-400 font-bold text-sm mb-1 uppercase flex items-center gap-2">
-                        <span class="text-indigo-400">02</span> Chọn giao diện UI
+                    <h3 class="text-cyan-400 font-bold text-sm mb-1 uppercase flex items-center gap-2 text-">
+                        <span class="text-indigo-400">02</span> Giao diện UI
                     </h3>
                     <p class="text-[10px] text-slate-500 mb-6 italic">Thay đổi kiểu hiển thị thông số trên HUD.</p>
                     <div class="flex items-center gap-4">
@@ -107,10 +106,10 @@
                 </div>
 
                 <div class="glass-card rounded-2xl p-6" style="z-index: 80;">
-                    <h3 class="text-cyan-400 font-bold text-sm mb-1 uppercase flex items-center gap-2">
+                    <h3 class="text-cyan-400 font-bold text-sm mb-1 uppercase flex items-center gap-2 text-">
                         <span class="text-indigo-400">03</span> Âm thanh khởi động
                     </h3>
-                    <p class="text-[10px] text-slate-500 mb-6 italic text-">Chọn âm báo khi bật thiết bị.</p>
+                    <p class="text-[10px] text-slate-500 mb-6 italic">Chọn âm báo khi bật thiết bị.</p>
                     <div class="flex items-center gap-4">
                         <div class="custom-select-container">
                             <div class="selected-box" onclick="toggleDrop('beep')">
@@ -118,15 +117,11 @@
                                 <i class="fas fa-chevron-down text-[10px]"></i>
                             </div>
                             <div class="options-list" id="beep-list">
-                                <div class="option-item" onclick="setVal('beep', 'B0', 'Tắt Âm Khởi Động')">Tắt Âm Khởi Động</div>
-                                <div class="option-item" onclick="setVal('beep', 'B1', 'Âm Khởi Động 1')">Âm Khởi Động 1</div>
-                                <div class="option-item" onclick="setVal('beep', 'B2', 'Âm Khởi Động 2')">Âm Khởi Động 2</div>
-                                <div class="option-item" onclick="setVal('beep', 'B3', 'Âm Khởi Động 3')">Âm Khởi Động 3</div>
-                                <div class="option-item" onclick="setVal('beep', 'B4', 'Âm Khởi Động 4')">Âm Khởi Động 4</div>
-                                <div class="option-item" onclick="setVal('beep', 'B5', 'Âm Khởi Động 5')">Âm Khởi Động 5</div>
-                                <div class="option-item" onclick="setVal('beep', 'B6', 'Âm Khởi Động 6')">Âm Khởi Động 6</div>
-                                <div class="option-item" onclick="setVal('beep', 'B7', 'Âm Khởi Động 7')">Âm Khởi Động 7</div>
-                                <div class="option-item" onclick="setVal('beep', 'B8', 'Âm Khởi Động 8')">Âm Khởi Động 8</div>
+                                <div class="option-item" onclick="setVal('beep', 'B0', 'Tắt Âm (B0)')">Tắt Âm (B0)</div>
+                                <div class="option-item" onclick="setVal('beep', 'B1', 'Mặc định (B1)')">Mặc định (B1)</div>
+                                <div class="option-item" onclick="setVal('beep', 'B2', 'Future (B2)')">Future (B2)</div>
+                                <div class="option-item" onclick="setVal('beep', 'B3', 'Classic (B3)')">Classic (B3)</div>
+                                <div class="option-item" onclick="setVal('beep', 'B8', 'Alert (B8)')">Alert (B8)</div>
                             </div>
                         </div>
                         <button onclick="sendFinal('beep')" class="btn-send">Gửi</button>
@@ -137,16 +132,16 @@
 
             <div class="lg:col-span-5">
                 <div class="glass-card rounded-2xl p-6 h-full flex flex-col border border-slate-800">
-                    <div class="flex justify-between items-center mb-4 text-cyan-400 px-2 font-bold uppercase text-[10px]">
-                        <span><i class="fas fa-terminal mr-2 text-"></i> Serial Monitor</span>
+                    <div class="flex justify-between items-center mb-4 text-cyan-400 px-2 font-bold uppercase text-[10px] text-">
+                        <span><i class="fas fa-terminal mr-2"></i> Monitor</span>
                         <button onclick="document.getElementById('log').innerHTML=''" class="text-slate-600 hover:text-white uppercase text-[8px]">Clear</button>
                     </div>
-                    <div id="log" class="flex-grow font-mono text-[9px] leading-relaxed text-cyan-500/70 overflow-y-auto mb-4 p-4 bg-slate-950/80 rounded-xl border border-slate-900 min-h-[450px]">
-                        > Chờ tín hiệu kết nối...
+                    <div id="log" class="flex-grow font-mono text-[9px] leading-relaxed text-cyan-500/70 overflow-y-auto mb-4 p-4 bg-slate-950/80 rounded-xl border border-slate-900 min-h-[450px] shadow-inner">
+                        <div id="log-placeholder" class="text-slate-600 italic">> Chờ tín hiệu kết nối...</div>
                     </div>
-                    <div class="flex gap-2 bg-slate-900/50 p-2 rounded-xl border border-slate-800">
-                        <input type="text" id="manual" placeholder="Nhập lệnh tay..." class="flex-grow bg-transparent px-3 py-2 text-xs text-white outline-none">
-                        <button onclick="sendCmd(document.getElementById('manual').value)" class="bg-cyan-600 p-2 rounded-lg text-slate-950 hover:bg-cyan-400 active:scale-90"><i class="fas fa-paper-plane text-"></i></button>
+                    <div class="flex gap-2 bg-slate-900/50 p-2 rounded-xl border border-slate-800 text-">
+                        <input type="text" id="manual" placeholder="Lệnh tay..." class="flex-grow bg-transparent px-3 py-2 text-xs text-white outline-none">
+                        <button onclick="sendCmd(document.getElementById('manual').value)" class="bg-cyan-600 p-2 rounded-lg text-slate-950 hover:bg-cyan-400 active:scale-90"><i class="fas fa-paper-plane"></i></button>
                     </div>
                 </div>
             </div>
@@ -166,19 +161,29 @@
         function setVal(type, val, label) {
             document.getElementById(type+'-label').innerText = label;
             currentVals[type] = val;
-            document.getElementById(type+'-list').classList.remove('active');
+            document.querySelectorAll('.options-list').forEach(l => l.classList.remove('active'));
         }
 
         async function initSerial() {
             try {
                 port = await navigator.serial.requestPort();
                 await port.open({ baudRate: 115200 });
+                
+                // Cập nhật giao diện Trạng thái
                 document.getElementById('status-dot').className = "w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_10px_#10b981]";
                 document.getElementById('status-text').innerText = "Thiết bị đã kết nối";
-                document.getElementById('status-text').className = "text-emerald-500";
+                document.getElementById('status-text').className = "text-emerald-500 font-extrabold";
                 document.getElementById('status-card').className = "glass-card rounded-2xl p-6 flex items-center justify-between border-l-4 border-l-emerald-500";
+                
+                // Cập nhật Monitor - Xóa placeholder và báo sẵn sàng
+                const logEl = document.getElementById('log');
+                logEl.innerHTML = '<div class="text-emerald-400 font-bold italic mb-2 tracking-widest underline underline-offset-4">>>> KẾT NỐI THÀNH CÔNG! HỆ THỐNG SẴN SÀNG...</div>';
+                
                 read();
-            } catch (e) { console.log(e); }
+            } catch (e) { 
+                console.log(e);
+                alert("Không thể kết nối Serial!");
+            }
         }
 
         async function sendFinal(type) {
@@ -188,11 +193,16 @@
 
         async function sendCmd(c) {
             if (!port) return alert("Vui lòng kết nối Serial trước!");
-            if (port?.writable) {
-                const w = port.writable.getWriter();
-                await writer.write(new TextEncoder().encode(c + "\n"));
-                writer.releaseLock();
-                log("> GỬI: " + c, "cmd");
+            try {
+                if (port?.writable) {
+                    const encoder = new TextEncoder();
+                    const writer = port.writable.getWriter(); // Đã sửa từ 'w' thành logic writer chuẩn
+                    await writer.write(encoder.encode(c + "\n"));
+                    writer.releaseLock();
+                    log("> GỬI LỆNH: " + c, "cmd");
+                }
+            } catch (err) {
+                log("LỖI GỬI LỆNH: " + err.message, "err");
             }
         }
 
@@ -205,19 +215,31 @@
                         if (done) break;
                         log(new TextDecoder().decode(value), "ser");
                     }
-                } catch (e) { break; } finally { reader.releaseLock(); }
+                } catch (e) { 
+                    log("MẤT KẾT NỐI!", "err");
+                    break; 
+                } finally { reader.releaseLock(); }
             }
         }
 
         function log(m, t) {
             const l = document.getElementById('log');
             const d = document.createElement('div');
-            d.className = t === 'cmd' ? 'text-white font-bold my-1' : 'text-cyan-500/60';
+            
+            if (t === 'cmd') {
+                d.className = 'text-white font-bold my-1 bg-cyan-900/40 px-2 py-1 rounded border-l-2 border-cyan-400 shadow-sm';
+            } else if (t === 'err') {
+                d.className = 'text-red-400 font-bold my-1 italic underline';
+            } else {
+                d.className = 'text-cyan-400/80 py-0.5 border-l border-cyan-800/30 pl-2 ml-1 tracking-tight';
+            }
+            
             d.textContent = `[${new Date().toLocaleTimeString()}] ${m.trim()}`;
             l.appendChild(d);
             l.scrollTop = l.scrollHeight;
         }
 
+        // Đóng dropdown khi nhấn ra ngoài
         window.onclick = e => {
             if (!e.target.closest('.custom-select-container')) {
                 document.querySelectorAll('.options-list').forEach(l => l.classList.remove('active'));
