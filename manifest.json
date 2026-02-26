@@ -1,6 +1,7 @@
 {
-  "name": "VietHud Update",
-  "version": "1.0.0",
+  "name": "VietHud Project",
+  "version": "1.0.1",
+  "new_install_prompt_erase": true,
   "builds": [
     {
       "chipFamily": "ESP32",
