@@ -3,18 +3,16 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VietHud Project | Control Panel</title>
-    
+    <title>VietHud Project | HUD Config</title>
     <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
-    
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
         body { background: #0b0f19; color: #e2e8f0; font-family: 'Inter', sans-serif; }
         .glass-panel { background: rgba(17, 24, 39, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
         .terminal { font-family: 'JetBrains Mono', monospace; background: #010409; border: 1px solid #30363d; }
-        .btn-action { @apply bg-slate-800 hover:bg-cyan-600 text-white py-2 px-3 rounded-xl transition-all active:scale-95 text-xs font-bold border border-slate-700 w-full; }
+        .select-custom { @apply w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs text-cyan-400 outline-none focus:border-cyan-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all; }
+        .btn-connect { @apply bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-6 rounded-xl transition-all active:scale-95 flex items-center gap-2 shadow-lg shadow-emerald-900/20; }
         #serial-log::-webkit-scrollbar { width: 4px; }
         #serial-log::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 10px; }
         .neon-glow { text-shadow: 0 0 10px rgba(6, 182, 212, 0.5); }
@@ -25,68 +23,78 @@
     <div class="max-w-6xl mx-auto">
         <div class="flex flex-col md:flex-row justify-between items-end mb-8 gap-6 border-b border-slate-800 pb-8">
             <div>
-                <h1 class="text-5xl font-black text-cyan-500 tracking-tighter italic neon-glow">VIETHUD <span class="text-white text-4xl">PROJECT</span></h1>
+                <h1 class="text-5xl font-black text-cyan-500 tracking-tighter italic neon-glow uppercase">VIETHUD <span class="text-white text-4xl">PROJECT</span></h1>
                 <p class="text-slate-500 mt-2 font-mono uppercase tracking-widest text-xs">Firmware Management v1.0.1</p>
             </div>
             
-            <esp-web-install-button manifest="./manifest.json">
-                <button slot="activate" class="bg-cyan-600 hover:bg-cyan-400 text-slate-900 font-black py-4 px-10 rounded-2xl shadow-2xl shadow-cyan-500/20 transition-all flex items-center gap-3 active:scale-95">
-                    FLASH FIRMWARE
+            <div class="flex flex-col md:flex-row gap-4">
+                <button id="btn-connect-manual" onclick="initSerial()" class="btn-connect uppercase text-xs">
+                    <span id="connect-status-dot" class="w-2 h-2 rounded-full bg-red-500"></span> 
+                    Connect Serial
                 </button>
-            </esp-web-install-button>
+                <esp-web-install-button manifest="./manifest.json">
+                    <button slot="activate" class="bg-cyan-600 hover:bg-cyan-400 text-slate-900 font-black py-3 px-8 rounded-xl shadow-2xl shadow-cyan-500/20 transition-all flex items-center gap-3 active:scale-95 text-xs uppercase">
+                        Flash Firmware
+                    </button>
+                </esp-web-install-button>
+            </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             
             <div class="lg:col-span-7 space-y-6">
-                <div class="glass-panel rounded-[2rem] p-8 shadow-2xl">
-                    <h2 class="text-xl font-bold mb-8 text-cyan-400 flex items-center gap-3 underline decoration-cyan-900 underline-offset-8">
-                        THIẾT LẬP THÔNG SỐ
+                <div class="glass-panel rounded-[2rem] p-8 shadow-2xl border-t border-cyan-500/20">
+                    <h2 class="text-xl font-bold mb-8 text-cyan-400 flex items-center gap-3 underline decoration-cyan-900 underline-offset-8 uppercase tracking-tighter">
+                        HUD Config
                     </h2>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div>
-                            <label class="block text-[10px] text-slate-500 mb-4 font-bold tracking-widest">HƯỚNG MÀN HÌNH (0-3)</label>
-                            <div class="grid grid-cols-4 gap-2 text-center">
-                                <button onclick="sendCmd('0')" class="btn-action">0°</button>
-                                <button onclick="sendCmd('1')" class="btn-action">90°</button>
-                                <button onclick="sendCmd('2')" class="btn-action">180°</button>
-                                <button onclick="sendCmd('3')" class="btn-action">270°</button>
-                            </div>
+                            <label class="block text-[10px] text-slate-500 mb-4 font-bold tracking-widest uppercase">Hướng màn hình (1-6)</label>
+                            <select id="cfg-rotation" onchange="sendCmd(this.value)" class="select-custom" disabled>
+                                <option value="" selected disabled>Chọn hướng...</option>
+                                <option value="1">Hướng 1 (Mặc định)</option>
+                                <option value="2">Hướng 2 (Xoay 90°)</option>
+                                <option value="3">Hướng 3 (Xoay 180°)</option>
+                                <option value="4">Hướng 4 (Xoay 270°)</option>
+                                <option value="5">Hướng 5 (Lật gương)</option>
+                                <option value="6">Hướng 6 (Lật gương dọc)</option>
+                            </select>
                         </div>
 
                         <div>
-                            <label class="block text-[10px] text-slate-500 mb-4 font-bold tracking-widest">GIAO DIỆN (U1-U3)</label>
-                            <div class="grid grid-cols-3 gap-2">
-                                <button onclick="sendCmd('U1')" class="btn-action">UI-1</button>
-                                <button onclick="sendCmd('U2')" class="btn-action">UI-2</button>
-                                <button onclick="sendCmd('U3')" class="btn-action">UI-3</button>
-                            </div>
+                            <label class="block text-[10px] text-slate-500 mb-4 font-bold tracking-widest uppercase">Giao diện (UI 1-9)</label>
+                            <select id="cfg-ui" onchange="sendCmd(this.value)" class="select-custom" disabled>
+                                <option value="" selected disabled>Chọn UI...</option>
+                                <option value="U1">Giao diện UI 1</option>
+                                <option value="U2">Giao diện UI 2</option>
+                                <option value="U3">Giao diện UI 3</option>
+                                <option value="U4">Giao diện UI 4</option>
+                                <option value="U5">Giao diện UI 5</option>
+                                <option value="U6">Giao diện UI 6</option>
+                                <option value="U7">Giao diện UI 7</option>
+                                <option value="U8">Giao diện UI 8</option>
+                                <option value="U9">Giao diện UI 9</option>
+                            </select>
                         </div>
 
                         <div>
-                            <label class="block text-[10px] text-slate-500 mb-4 font-bold tracking-widest">BÙ TỐC ĐỘ (O0-O5)</label>
-                            <div class="grid grid-cols-4 gap-2">
-                                <button onclick="sendCmd('O0')" class="btn-action">0</button>
-                                <button onclick="sendCmd('O1')" class="btn-action">+1</button>
-                                <button onclick="sendCmd('O2')" class="btn-action">+2</button>
-                                <button onclick="sendCmd('O5')" class="btn-action">+5</button>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-[10px] text-slate-500 mb-4 font-bold tracking-widest">ÂM THANH (B0-B8)</label>
-                            <select onchange="sendCmd(this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs text-cyan-400 outline-none focus:border-cyan-500">
+                            <label class="block text-[10px] text-slate-500 mb-4 font-bold tracking-widest uppercase">Âm thanh (B0-B8)</label>
+                            <select id="cfg-beep" onchange="sendCmd(this.value)" class="select-custom" disabled>
                                 <option value="B0">Tắt âm (B0)</option>
                                 <option value="B1" selected>Mặc định (B1)</option>
                                 <option value="B2">Future Tech (B2)</option>
-                                <option value="B3">Retro (B3)</option>
+                                <option value="B3">Retro Classic (B3)</option>
                                 <option value="B4">Soft Double (B4)</option>
                                 <option value="B5">Powerful (B5)</option>
-                                <option value="B6">Happy (B6)</option>
-                                <option value="B7">Robot (B7)</option>
+                                <option value="B6">Happy Scale (B6)</option>
+                                <option value="B7">Robot Chime (B7)</option>
                                 <option value="B8">Alert Style (B8)</option>
                             </select>
+                        </div>
+
+                        <div class="flex items-center bg-slate-900/50 p-4 rounded-xl border border-slate-800">
+                             <p class="text-[10px] text-slate-500 italic">Kết nối Serial để mở khóa các tùy chỉnh thông số thiết bị.</p>
                         </div>
                     </div>
                 </div>
@@ -95,19 +103,19 @@
             <div class="lg:col-span-5">
                 <div class="terminal rounded-[2rem] p-6 h-full flex flex-col shadow-2xl border border-cyan-900/30">
                     <div class="flex justify-between items-center mb-4">
-                        <span class="text-xs font-bold text-slate-500 flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> SERIAL MONITOR
+                        <span class="text-xs font-bold text-slate-500 flex items-center gap-2 text-cyan-400">
+                            <span class="w-2 h-2 rounded-full bg-cyan-500 animate-pulse"></span> MONITOR
                         </span>
-                        <button onclick="clearLog()" class="text-[10px] text-slate-600 hover:text-white uppercase font-bold tracking-tighter">Xóa Log</button>
+                        <button onclick="clearLog()" class="text-[10px] text-slate-600 hover:text-white uppercase font-bold tracking-tighter">Clear</button>
                     </div>
                     
                     <div id="serial-log" class="flex-grow font-mono text-[11px] leading-relaxed text-green-500 overflow-y-auto mb-6 p-2 min-h-[350px]">
-                        > Hệ thống sẵn sàng. Vui lòng kết nối...
+                        > Vui lòng nhấn "CONNECT SERIAL" để bắt đầu...
                     </div>
 
                     <div class="flex gap-2 bg-slate-900/50 p-2 rounded-2xl border border-slate-800">
-                        <input type="text" id="manual-cmd" placeholder="Nhập lệnh tay (VD: U2)..." class="flex-grow bg-transparent px-3 py-2 text-xs text-white outline-none">
-                        <button onclick="sendManual()" class="bg-cyan-600 p-2 rounded-xl text-slate-900 hover:bg-cyan-400 transition-all active:scale-90 shadow-lg">
+                        <input type="text" id="manual-cmd" placeholder="Lệnh tay..." class="flex-grow bg-transparent px-3 py-2 text-xs text-white outline-none disabled:opacity-20" disabled>
+                        <button id="btn-send-manual" onclick="sendManual()" class="bg-cyan-600 p-2 rounded-xl text-slate-900 hover:bg-cyan-400 disabled:bg-slate-700 transition-all shadow-lg" disabled>
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/></svg>
                         </button>
                     </div>
@@ -120,24 +128,34 @@
         let port;
         let reader;
 
+        function setControlsEnabled(enabled) {
+            const controls = ['cfg-rotation', 'cfg-ui', 'cfg-beep', 'manual-cmd', 'btn-send-manual'];
+            controls.forEach(id => {
+                document.getElementById(id).disabled = !enabled;
+            });
+            const dot = document.getElementById('connect-status-dot');
+            dot.className = enabled ? "w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_#10b981]" : "w-2 h-2 rounded-full bg-red-500";
+        }
+
         async function initSerial() {
             try {
                 port = await navigator.serial.requestPort();
                 await port.open({ baudRate: 115200 });
-                logToScreen("ĐÃ KẾT NỐI!", "sys");
+                logToScreen("KẾT NỐI THÀNH CÔNG!", "sys");
+                setControlsEnabled(true);
                 startReading();
             } catch (e) {
-                logToScreen("LỖI: Không thể mở cổng Serial.", "sys");
+                logToScreen("LỖI: Cổng Serial không được mở.", "sys");
             }
         }
 
         async function sendCmd(c) {
-            if (!port) await initSerial();
-            if (port && port.writable) {
+            if (!port) return;
+            if (port.writable) {
                 const writer = port.writable.getWriter();
                 await writer.write(new TextEncoder().encode(c + "\n"));
                 writer.releaseLock();
-                logToScreen("GỬI LỆNH: " + c, "cmd");
+                logToScreen("SEND: " + c, "cmd");
             }
         }
 
@@ -150,7 +168,10 @@
                         if (done) break;
                         logToScreen(new TextDecoder().decode(value), "serial");
                     }
-                } catch (e) { break; } finally { reader.releaseLock(); }
+                } catch (e) { 
+                    setControlsEnabled(false);
+                    break; 
+                } finally { reader.releaseLock(); }
             }
         }
 
