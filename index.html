@@ -11,24 +11,13 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
         body { background: #0b121f; color: #e2e8f0; font-family: 'Inter', sans-serif; }
         .glass-card { background: rgba(17, 25, 40, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); position: relative; transition: 0.3s; }
-        .glass-card:hover { border-color: rgba(6, 182, 212, 0.3); }
         .neon-glow { text-shadow: 0 0 15px rgba(6, 182, 212, 0.6); }
-        
         .custom-select-container { position: relative; width: 100%; z-index: 50; }
-        .selected-box { 
-            @apply w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-cyan-400 cursor-pointer flex justify-between items-center transition-all hover:border-cyan-500 shadow-inner;
-        }
-        .options-list { 
-            position: absolute; top: calc(100% + 5px); left: 0; right: 0; background: #0f172a; 
-            border: 1px solid #1e293b; border-radius: 12px; display: none;
-            max-height: 250px; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,1);
-            z-index: 999;
-        }
+        .selected-box { @apply w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-cyan-400 cursor-pointer flex justify-between items-center transition-all hover:border-cyan-500 shadow-inner; }
+        .options-list { position: absolute; top: calc(100% + 5px); left: 0; right: 0; background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; display: none; max-height: 250px; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,1); z-index: 999; }
         .option-item { @apply p-3 text-xs text-slate-300 cursor-pointer hover:bg-cyan-500 hover:text-slate-900 transition-colors border-b border-slate-800/50 last:border-0; }
         .options-list.active { display: block; animation: slideIn 0.2s ease; }
-        
         .btn-send { @apply bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-bold py-2 px-6 rounded-lg transition-all active:scale-95 shadow-lg shadow-indigo-900/20 uppercase tracking-widest; }
-        
         @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         #log::-webkit-scrollbar { width: 4px; }
         #log::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 10px; }
@@ -39,12 +28,14 @@
     <div class="max-w-6xl mx-auto w-full">
         <div class="flex flex-col md:flex-row justify-between items-center mb-12 gap-6 border-b border-slate-800 pb-10">
             <div class="text-center md:text-left">
-                <h1 class="text-5xl font-black text-cyan-500 tracking-tighter italic neon-glow uppercase">VIETHUD <span class="text-white text-3xl block md:inline">PROJECT</span></h1>
+                <h1 class="text-5xl font-black text-cyan-500 tracking-tighter italic neon-glow uppercase leading-none">VIETHUD <span class="text-white text-3xl block md:inline">PROJECT</span></h1>
                 <p class="text-slate-500 mt-3 font-mono uppercase tracking-[0.3em] text-[10px]">Professional Firmware Management v1.0.1</p>
             </div>
-            <esp-web-install-button manifest="./manifest.json">
-                <button slot="activate" class="bg-cyan-600 hover:bg-cyan-400 text-slate-950 font-black py-4 px-10 rounded-xl shadow-xl transition-all active:scale-95 text-[10px] uppercase tracking-widest">FLASH FIRMWARE</button>
-            </esp-web-install-button>
+            <div onclick="prepareFlash()">
+                <esp-web-install-button manifest="./manifest.json">
+                    <button slot="activate" class="bg-cyan-600 hover:bg-cyan-400 text-slate-950 font-black py-4 px-10 rounded-xl shadow-xl transition-all active:scale-95 text-[10px] uppercase tracking-widest">FLASH FIRMWARE</button>
+                </esp-web-install-button>
+            </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -53,22 +44,19 @@
                 <div class="glass-card rounded-2xl p-6 flex items-center justify-between border-l-4 border-l-red-500" id="status-card">
                     <div class="flex items-center gap-4 text-xs font-bold uppercase tracking-widest">
                         <div id="status-dot" class="w-3 h-3 rounded-full bg-red-500 animate-pulse"></div>
-                        <span id="status-text" class="text-red-500 font-extrabold">Thiết bị chưa kết nối</span>
+                        <span id="status-text" class="text-red-500 font-extrabold text-[10px]">Thiết bị chưa kết nối</span>
                     </div>
-                    <button onclick="initSerial()" class="text-cyan-400 border border-cyan-500/30 px-4 py-2 rounded-lg text-[10px] font-bold uppercase hover:bg-cyan-500/10 transition-all">Kết nối Serial</button>
+                    <div class="flex gap-2">
+                        <button id="btn-connect" onclick="initSerial()" class="text-cyan-400 border border-cyan-500/30 px-4 py-2 rounded-lg text-[10px] font-bold uppercase hover:bg-cyan-500/10 transition-all">Kết nối</button>
+                        <button id="btn-disconnect" onclick="disconnectSerial()" class="hidden text-red-400 border border-red-500/30 px-4 py-2 rounded-lg text-[10px] font-bold uppercase hover:bg-red-500/10 transition-all">Ngắt</button>
+                    </div>
                 </div>
 
                 <div class="glass-card rounded-2xl p-6" style="z-index: 100;">
-                    <h3 class="text-cyan-400 font-bold text-sm mb-1 uppercase flex items-center gap-2">
-                        <span class="text-indigo-400">01</span> Xoay màn hình
-                    </h3>
-                    <p class="text-[10px] text-slate-500 mb-6 italic">Chọn hướng hiển thị phù hợp với góc nhìn.</p>
+                    <h3 class="text-cyan-400 font-bold text-sm mb-1 uppercase flex items-center gap-2">01. Xoay màn hình</h3>
                     <div class="flex items-center gap-4">
                         <div class="custom-select-container">
-                            <div class="selected-box" onclick="toggleDrop('rot')">
-                                <span id="rot-label">Chọn hướng hiển thị...</span>
-                                <i class="fas fa-chevron-down text-[10px]"></i>
-                            </div>
+                            <div class="selected-box" onclick="toggleDrop('rot')"><span id="rot-label">Chọn hướng hiển thị...</span><i class="fas fa-chevron-down text-[10px]"></i></div>
                             <div class="options-list" id="rot-list">
                                 <div class="option-item" onclick="setVal('rot', '1', 'Hướng 1')">Hướng 1</div>
                                 <div class="option-item" onclick="setVal('rot', '2', 'Hướng 2')">Hướng 2</div>
@@ -83,22 +71,12 @@
                 </div>
 
                 <div class="glass-card rounded-2xl p-6" style="z-index: 90;">
-                    <h3 class="text-cyan-400 font-bold text-sm mb-1 uppercase flex items-center gap-2 text-">
-                        <span class="text-indigo-400">02</span> Giao diện UI
-                    </h3>
-                    <p class="text-[10px] text-slate-500 mb-6 italic">Thay đổi kiểu hiển thị thông số trên HUD.</p>
+                    <h3 class="text-cyan-400 font-bold text-sm mb-1 uppercase flex items-center gap-2">02. Giao diện UI</h3>
                     <div class="flex items-center gap-4">
                         <div class="custom-select-container">
-                            <div class="selected-box" onclick="toggleDrop('ui')">
-                                <span id="ui-label">Chọn giao diện...</span>
-                                <i class="fas fa-chevron-down text-[10px]"></i>
-                            </div>
+                            <div class="selected-box" onclick="toggleDrop('ui')"><span id="ui-label">Chọn giao diện...</span><i class="fas fa-chevron-down text-[10px]"></i></div>
                             <div class="options-list" id="ui-list">
-                                <script>
-                                    for(let i=1; i<=9; i++) {
-                                        document.write(`<div class="option-item" onclick="setVal('ui', 'U${i}', 'Giao diện UI ${i}')">Giao diện UI ${i}</div>`);
-                                    }
-                                </script>
+                                <script>for(let i=1; i<=9; i++) document.write(`<div class="option-item" onclick="setVal('ui', 'U${i}', 'UI ${i}')">Giao diện UI ${i}</div>`);</script>
                             </div>
                         </div>
                         <button onclick="sendFinal('ui')" class="btn-send">Gửi</button>
@@ -106,41 +84,39 @@
                 </div>
 
                 <div class="glass-card rounded-2xl p-6" style="z-index: 80;">
-                    <h3 class="text-cyan-400 font-bold text-sm mb-1 uppercase flex items-center gap-2 text-">
-                        <span class="text-indigo-400">03</span> Âm thanh khởi động
-                    </h3>
-                    <p class="text-[10px] text-slate-500 mb-6 italic">Chọn âm báo khi bật thiết bị.</p>
+                    <h3 class="text-cyan-400 font-bold text-sm mb-1 uppercase flex items-center gap-2">03. Âm thanh khởi động</h3>
                     <div class="flex items-center gap-4">
                         <div class="custom-select-container">
-                            <div class="selected-box" onclick="toggleDrop('beep')">
-                                <span id="beep-label">Mặc định (B1)</span>
-                                <i class="fas fa-chevron-down text-[10px]"></i>
-                            </div>
+                            <div class="selected-box" onclick="toggleDrop('beep')"><span id="beep-label">Âm Khởi Động 1</span><i class="fas fa-chevron-down text-[10px]"></i></div>
                             <div class="options-list" id="beep-list">
-                                <div class="option-item" onclick="setVal('beep', 'B0', 'Tắt Âm (B0)')">Tắt Âm (B0)</div>
-                                <div class="option-item" onclick="setVal('beep', 'B1', 'Mặc định (B1)')">Mặc định (B1)</div>
-                                <div class="option-item" onclick="setVal('beep', 'B2', 'Future (B2)')">Future (B2)</div>
-                                <div class="option-item" onclick="setVal('beep', 'B3', 'Classic (B3)')">Classic (B3)</div>
-                                <div class="option-item" onclick="setVal('beep', 'B8', 'Alert (B8)')">Alert (B8)</div>
+                                <div class="option-item" onclick="setVal('beep', 'B0', 'Tắt Âm Khởi Động')">Tắt Âm Khởi Động</div>
+                                <div class="option-item" onclick="setVal('beep', 'B1', 'Âm Khởi Động 1')">Âm Khởi Động 1</div>
+                                <div class="option-item" onclick="setVal('beep', 'B2', 'Âm Khởi Động 2')">Âm Khởi Động 2</div>
+                                <div class="option-item" onclick="setVal('beep', 'B3', 'Âm Khởi Động 3')">Âm Khởi Động 3</div>
+                                <div class="option-item" onclick="setVal('beep', 'B4', 'Âm Khởi Động 4')">Âm Khởi Động 4</div>
+                                <div class="option-item" onclick="setVal('beep', 'B5', 'Âm Khởi Động 5')">Âm Khởi Động 5</div>
+                                <div class="option-item" onclick="setVal('beep', 'B6', 'Âm Khởi Động 6')">Âm Khởi Động 6</div>
+                                <div class="option-item" onclick="setVal('beep', 'B7', 'Âm Khởi Động 7')">Âm Khởi Động 7</div>
+                                <div class="option-item" onclick="setVal('beep', 'B8', 'Âm Khởi Động 8')">Âm Khởi Động 8</div>
                             </div>
                         </div>
                         <button onclick="sendFinal('beep')" class="btn-send">Gửi</button>
                     </div>
                 </div>
-
             </div>
 
             <div class="lg:col-span-5">
                 <div class="glass-card rounded-2xl p-6 h-full flex flex-col border border-slate-800">
-                    <div class="flex justify-between items-center mb-4 text-cyan-400 px-2 font-bold uppercase text-[10px] text-">
+                    <div class="flex justify-between items-center mb-4 text-cyan-400 px-2 font-bold uppercase text-[10px]">
                         <span><i class="fas fa-terminal mr-2"></i> Monitor</span>
-                        <button onclick="document.getElementById('log').innerHTML=''" class="text-slate-600 hover:text-white uppercase text-[8px]">Clear</button>
+                        <button onclick="document.getElementById('log-content').innerHTML=''" class="text-slate-600 hover:text-white uppercase text-[8px]">Clear</button>
                     </div>
-                    <div id="log" class="flex-grow font-mono text-[9px] leading-relaxed text-cyan-500/70 overflow-y-auto mb-4 p-4 bg-slate-950/80 rounded-xl border border-slate-900 min-h-[450px] shadow-inner">
-                        <div id="log-placeholder" class="text-slate-600 italic">> Chờ tín hiệu kết nối...</div>
+                    <div id="log" class="flex-grow font-mono text-[9px] leading-relaxed text-cyan-500/70 overflow-y-auto mb-4 p-4 bg-slate-950/80 rounded-xl border border-slate-900 min-h-[450px]">
+                        <div id="log-content"></div>
+                        <div id="log-placeholder" class="text-slate-600 italic">> Chờ kết nối...</div>
                     </div>
-                    <div class="flex gap-2 bg-slate-900/50 p-2 rounded-xl border border-slate-800 text-">
-                        <input type="text" id="manual" placeholder="Lệnh tay..." class="flex-grow bg-transparent px-3 py-2 text-xs text-white outline-none">
+                    <div class="flex gap-2 bg-slate-900/50 p-2 rounded-xl border border-slate-800">
+                        <input type="text" id="manual" placeholder="Nhập lệnh tay..." class="flex-grow bg-transparent px-3 py-2 text-xs text-white outline-none">
                         <button onclick="sendCmd(document.getElementById('manual').value)" class="bg-cyan-600 p-2 rounded-lg text-slate-950 hover:bg-cyan-400 active:scale-90"><i class="fas fa-paper-plane"></i></button>
                     </div>
                 </div>
@@ -150,6 +126,7 @@
 
     <script>
         let port, reader, currentVals = { rot: '', ui: '', beep: 'B1' };
+        let keepReading = true;
 
         function toggleDrop(id) {
             const list = document.getElementById(id+'-list');
@@ -168,21 +145,41 @@
             try {
                 port = await navigator.serial.requestPort();
                 await port.open({ baudRate: 115200 });
-                
-                // Cập nhật giao diện Trạng thái
-                document.getElementById('status-dot').className = "w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_10px_#10b981]";
-                document.getElementById('status-text').innerText = "Thiết bị đã kết nối";
-                document.getElementById('status-text').className = "text-emerald-500 font-extrabold";
-                document.getElementById('status-card').className = "glass-card rounded-2xl p-6 flex items-center justify-between border-l-4 border-l-emerald-500";
-                
-                // Cập nhật Monitor - Xóa placeholder và báo sẵn sàng
-                const logEl = document.getElementById('log');
-                logEl.innerHTML = '<div class="text-emerald-400 font-bold italic mb-2 tracking-widest underline underline-offset-4">>>> KẾT NỐI THÀNH CÔNG! HỆ THỐNG SẴN SÀNG...</div>';
-                
+                updateUIStatus(true);
+                document.getElementById('log-placeholder').classList.add('hidden');
+                log(">>> KẾT NỐI THÀNH CÔNG! HỆ THỐNG SẴN SÀNG...", "sys");
+                keepReading = true;
                 read();
-            } catch (e) { 
-                console.log(e);
-                alert("Không thể kết nối Serial!");
+            } catch (e) { alert("Lỗi kết nối!"); }
+        }
+
+        async function disconnectSerial() {
+            keepReading = false;
+            if (reader) { await reader.cancel(); await reader.releaseLock(); reader = null; }
+            if (port) { await port.close(); port = null; }
+            updateUIStatus(false);
+            log(">>> ĐÃ NGẮT KẾT NỐI.", "sys");
+            document.getElementById('log-placeholder').classList.remove('hidden');
+        }
+
+        async function prepareFlash() { if (port) await disconnectSerial(); }
+
+        function updateUIStatus(conn) {
+            const dot = document.getElementById('status-dot');
+            const text = document.getElementById('status-text');
+            const card = document.getElementById('status-card');
+            if(conn) {
+                dot.className = "w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_10px_#10b981]";
+                text.innerText = "Đã kết nối"; text.className = "text-emerald-500 font-extrabold text-[10px]";
+                card.className = "glass-card rounded-2xl p-6 flex items-center justify-between border-l-4 border-l-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.1)]";
+                document.getElementById('btn-connect').classList.add('hidden');
+                document.getElementById('btn-disconnect').classList.remove('hidden');
+            } else {
+                dot.className = "w-3 h-3 rounded-full bg-red-500 animate-pulse";
+                text.innerText = "Thiết bị chưa kết nối"; text.className = "text-red-500 font-extrabold text-[10px]";
+                card.className = "glass-card rounded-2xl p-6 flex items-center justify-between border-l-4 border-l-red-500";
+                document.getElementById('btn-connect').classList.remove('hidden');
+                document.getElementById('btn-disconnect').classList.add('hidden');
             }
         }
 
@@ -194,20 +191,16 @@
         async function sendCmd(c) {
             if (!port) return alert("Vui lòng kết nối Serial trước!");
             try {
-                if (port?.writable) {
-                    const encoder = new TextEncoder();
-                    const writer = port.writable.getWriter(); // Đã sửa từ 'w' thành logic writer chuẩn
-                    await writer.write(encoder.encode(c + "\n"));
-                    writer.releaseLock();
-                    log("> GỬI LỆNH: " + c, "cmd");
-                }
-            } catch (err) {
-                log("LỖI GỬI LỆNH: " + err.message, "err");
-            }
+                const encoder = new TextEncoder();
+                const writer = port.writable.getWriter();
+                await writer.write(encoder.encode(c + "\n"));
+                writer.releaseLock();
+                log("> GỬI LỆNH: " + c, "cmd");
+            } catch (err) { log("LỖI GỬI: " + err.message, "err"); }
         }
 
         async function read() {
-            while (port?.readable) {
+            while (port?.readable && keepReading) {
                 reader = port.readable.getReader();
                 try {
                     while (true) {
@@ -215,36 +208,22 @@
                         if (done) break;
                         log(new TextDecoder().decode(value), "ser");
                     }
-                } catch (e) { 
-                    log("MẤT KẾT NỐI!", "err");
-                    break; 
-                } finally { reader.releaseLock(); }
+                } catch (e) { break; } finally { if(reader) reader.releaseLock(); }
             }
         }
 
         function log(m, t) {
-            const l = document.getElementById('log');
+            const l = document.getElementById('log-content');
             const d = document.createElement('div');
-            
-            if (t === 'cmd') {
-                d.className = 'text-white font-bold my-1 bg-cyan-900/40 px-2 py-1 rounded border-l-2 border-cyan-400 shadow-sm';
-            } else if (t === 'err') {
-                d.className = 'text-red-400 font-bold my-1 italic underline';
-            } else {
-                d.className = 'text-cyan-400/80 py-0.5 border-l border-cyan-800/30 pl-2 ml-1 tracking-tight';
-            }
-            
+            if (t === 'cmd') d.className = 'text-white font-bold my-1 bg-cyan-900/40 px-2 rounded';
+            else if (t === 'sys') d.className = 'text-yellow-500 font-bold italic';
+            else d.className = 'text-cyan-400/80 pl-2 border-l border-cyan-900 ml-1';
             d.textContent = `[${new Date().toLocaleTimeString()}] ${m.trim()}`;
             l.appendChild(d);
-            l.scrollTop = l.scrollHeight;
+            document.getElementById('log').scrollTop = document.getElementById('log').scrollHeight;
         }
 
-        // Đóng dropdown khi nhấn ra ngoài
-        window.onclick = e => {
-            if (!e.target.closest('.custom-select-container')) {
-                document.querySelectorAll('.options-list').forEach(l => l.classList.remove('active'));
-            }
-        };
+        window.onclick = e => { if (!e.target.closest('.custom-select-container')) document.querySelectorAll('.options-list').forEach(l => l.classList.remove('active')); };
     </script>
 </body>
 </html>
