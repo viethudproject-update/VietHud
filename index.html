@@ -10,27 +10,22 @@
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;700;900&display=swap');
         body { background: #0b121f; color: #e2e8f0; font-family: 'Inter', sans-serif; }
         .glass-panel { background: rgba(17, 25, 40, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
-        
-        /* FIX TRIỆT ĐỂ Ô TRẮNG */
-        .select-custom { 
-            appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2306b6d4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 1rem center;
-            background-size: 1em;
-            background-color: #020617; /* Ép nền cực tối */
-            @apply w-full border border-slate-800 rounded-2xl p-4 text-sm text-cyan-400 outline-none transition-all cursor-pointer hover:border-cyan-500 shadow-inner;
-        }
-
-        /* Ép màu cho danh sách xổ xuống - Đây là phần quan trọng nhất */
-        .select-custom option { 
-            background-color: #0f172a !important; /* Màu nền của các lựa chọn */
-            color: #22d3ee !important; /* Màu chữ của các lựa chọn */
-            padding: 12px;
-        }
-
         .neon-glow { text-shadow: 0 0 15px rgba(6, 182, 212, 0.6); }
         .terminal { font-family: 'JetBrains Mono', monospace; background: #010409; border: 1px solid #1e293b; }
+        
+        /* STYLE CHO CUSTOM DROPDOWN */
+        .custom-dropdown { position: relative; width: 100%; }
+        .dropdown-selected { 
+            @apply w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm text-cyan-400 cursor-pointer flex justify-between items-center transition-all hover:border-cyan-500;
+        }
+        .dropdown-list { 
+            position: absolute; top: 110%; left: 0; right: 0; background: #0f172a; 
+            border: 1px solid #1e293b; border-radius: 1rem; z-index: 50; display: none;
+            max-height: 250px; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+        .dropdown-item { @apply p-3 text-sm text-slate-300 cursor-pointer hover:bg-cyan-500 hover:text-slate-900 transition-colors; }
+        .dropdown-list.active { display: block; }
+        
         #serial-log::-webkit-scrollbar { width: 4px; }
         #serial-log::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 10px; }
     </style>
@@ -56,62 +51,68 @@
                 <div class="glass-panel rounded-[2.5rem] p-10 shadow-2xl border border-cyan-500/10 h-full">
                     <div class="flex justify-between items-center mb-10">
                         <h2 class="text-2xl font-black text-white uppercase tracking-tighter flex items-center gap-3">
-                            <span class="w-8 h-1 bg-cyan-500 text-xs"></span> HUD CONFIG
+                            <span class="w-8 h-1 bg-cyan-500"></span> HUD CONFIG
                         </h2>
-                        <div id="status-badge" class="flex items-center gap-2 px-3 py-1 bg-red-500/10 border border-red-500/20 rounded-full transition-all">
+                        <div id="status-badge" class="flex items-center gap-2 px-3 py-1 bg-red-500/10 border border-red-500/20 rounded-full">
                             <span id="status-dot" class="w-2 h-2 rounded-full bg-red-500"></span>
-                            <span id="status-text" class="text-[10px] font-bold text-red-500 uppercase tracking-widest">Disconnected</span>
+                            <span id="status-text" class="text-[10px] font-bold text-red-500 uppercase tracking-widest text-[8px]">Disconnected</span>
                         </div>
                     </div>
                     
                     <div class="space-y-6">
-                        <button id="btn-connect" onclick="initSerial()" class="w-full bg-slate-950 border border-slate-800 hover:border-cyan-500 text-cyan-400 font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-3 group shadow-xl">
-                            <span id="connect-btn-text" class="uppercase text-xs tracking-widest">Connect Serial Device</span>
+                        <button id="btn-connect" onclick="initSerial()" class="w-full bg-slate-950 border border-slate-800 hover:border-cyan-500 text-cyan-400 font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-3 group shadow-xl uppercase text-[10px] tracking-widest">
+                            Connect Serial Device
                         </button>
 
                         <div class="grid grid-cols-1 gap-6 pt-4">
-                            <div>
-                                <label class="block text-[10px] text-slate-500 mb-3 font-black tracking-[0.2em] uppercase ml-1">HƯỚNG MÀN HÌNH (1-6)</label>
-                                <select onchange="sendCmd(this.value)" class="select-custom">
-                                    <option value="" selected disabled>Chọn hướng hiển thị...</option>
-                                    <option value="1">Hướng 1 (Mặc định)</option>
-                                    <option value="2">Hướng 2 (Xoay 90°)</option>
-                                    <option value="3">Hướng 3 (Xoay 180°)</option>
-                                    <option value="4">Hướng 4 (Xoay 270°)</option>
-                                    <option value="5">Hướng 5 (Lật gương ngang)</option>
-                                    <option value="6">Hướng 6 (Lật gương dọc)</option>
-                                </select>
+                            <div class="custom-dropdown" id="dropdown-rot">
+                                <label class="block text-[9px] text-slate-500 mb-2 font-black tracking-widest uppercase ml-1">HƯỚNG MÀN HÌNH (1-6)</label>
+                                <div class="dropdown-selected" onclick="toggleDropdown('rot')">
+                                    <span id="rot-text">Chọn hướng hiển thị...</span>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"></path></svg>
+                                </div>
+                                <div class="dropdown-list" id="rot-list">
+                                    <div class="dropdown-item" onclick="selectItem('rot', '1', 'Hướng 1 (Mặc định)')">Hướng 1 (Mặc định)</div>
+                                    <div class="dropdown-item" onclick="selectItem('rot', '2', 'Hướng 2 (90°)')">Hướng 2 (Xoay 90°)</div>
+                                    <div class="dropdown-item" onclick="selectItem('rot', '3', 'Hướng 3 (180°)')">Hướng 3 (Xoay 180°)</div>
+                                    <div class="dropdown-item" onclick="selectItem('rot', '4', 'Hướng 4 (270°)')">Hướng 4 (Xoay 270°)</div>
+                                    <div class="dropdown-item" onclick="selectItem('rot', '5', 'Hướng 5 (Lật gương)')">Hướng 5 (Lật gương ngang)</div>
+                                    <div class="dropdown-item" onclick="selectItem('rot', '6', 'Hướng 6 (Lật dọc)')">Hướng 6 (Lật gương dọc)</div>
+                                </div>
                             </div>
 
-                            <div>
-                                <label class="block text-[10px] text-slate-500 mb-3 font-black tracking-[0.2em] uppercase ml-1">GIAO DIỆN (UI 1-9)</label>
-                                <select onchange="sendCmd(this.value)" class="select-custom">
-                                    <option value="" selected disabled>Chọn giao diện màn hình...</option>
-                                    <option value="U1">Giao diện UI 1</option>
-                                    <option value="U2">Giao diện UI 2</option>
-                                    <option value="U3">Giao diện UI 3</option>
-                                    <option value="U4">Giao diện UI 4</option>
-                                    <option value="U5">Giao diện UI 5</option>
-                                    <option value="U6">Giao diện UI 6</option>
-                                    <option value="U7">Giao diện UI 7</option>
-                                    <option value="U8">Giao diện UI 8</option>
-                                    <option value="U9">Giao diện UI 9</option>
-                                </select>
+                            <div class="custom-dropdown" id="dropdown-ui">
+                                <label class="block text-[9px] text-slate-500 mb-2 font-black tracking-widest uppercase ml-1">GIAO DIỆN (UI 1-9)</label>
+                                <div class="dropdown-selected" onclick="toggleDropdown('ui')">
+                                    <span id="ui-text">Chọn giao diện màn hình...</span>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"></path></svg>
+                                </div>
+                                <div class="dropdown-list" id="ui-list">
+                                    <div class="dropdown-item" onclick="selectItem('ui', 'U1', 'Giao diện UI 1')">Giao diện UI 1</div>
+                                    <div class="dropdown-item" onclick="selectItem('ui', 'U2', 'Giao diện UI 2')">Giao diện UI 2</div>
+                                    <div class="dropdown-item" onclick="selectItem('ui', 'U3', 'Giao diện UI 3')">Giao diện UI 3</div>
+                                    <div class="dropdown-item" onclick="selectItem('ui', 'U4', 'Giao diện UI 4')">Giao diện UI 4</div>
+                                    <div class="dropdown-item" onclick="selectItem('ui', 'U5', 'Giao diện UI 5')">Giao diện UI 5</div>
+                                    <div class="dropdown-item" onclick="selectItem('ui', 'U6', 'Giao diện UI 6')">Giao diện UI 6</div>
+                                    <div class="dropdown-item" onclick="selectItem('ui', 'U7', 'Giao diện UI 7')">Giao diện UI 7</div>
+                                    <div class="dropdown-item" onclick="selectItem('ui', 'U8', 'Giao diện UI 8')">Giao diện UI 8</div>
+                                    <div class="dropdown-item" onclick="selectItem('ui', 'U9', 'Giao diện UI 9')">Giao diện UI 9</div>
+                                </div>
                             </div>
 
-                            <div>
-                                <label class="block text-[10px] text-slate-500 mb-3 font-black tracking-[0.2em] uppercase ml-1">ÂM THANH KHỞI ĐỘNG (B0-B8)</label>
-                                <select onchange="sendCmd(this.value)" class="select-custom">
-                                    <option value="B0">Tắt âm báo (B0)</option>
-                                    <option value="B1" selected>Mặc định (B1)</option>
-                                    <option value="B2">Future Tech (B2)</option>
-                                    <option value="B3">Retro Classic (B3)</option>
-                                    <option value="B4">Soft Double (B4)</option>
-                                    <option value="B5">Powerful Start (B5)</option>
-                                    <option value="B6">Happy Scale (B6)</option>
-                                    <option value="B7">Robot Chime (B7)</option>
-                                    <option value="B8">Alert Style (B8)</option>
-                                </select>
+                            <div class="custom-dropdown" id="dropdown-beep">
+                                <label class="block text-[9px] text-slate-500 mb-2 font-black tracking-widest uppercase ml-1">ÂM THANH KHỞI ĐỘNG</label>
+                                <div class="dropdown-selected" onclick="toggleDropdown('beep')">
+                                    <span id="beep-text">Mặc định (B1)</span>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"></path></svg>
+                                </div>
+                                <div class="dropdown-list" id="beep-list">
+                                    <div class="dropdown-item" onclick="selectItem('beep', 'B0', 'Tắt âm báo (B0)')">Tắt âm báo (B0)</div>
+                                    <div class="dropdown-item" onclick="selectItem('beep', 'B1', 'Mặc định (B1)')">Mặc định (B1)</div>
+                                    <div class="dropdown-item" onclick="selectItem('beep', 'B2', 'Future Tech (B2)')">Future Tech (B2)</div>
+                                    <div class="dropdown-item" onclick="selectItem('beep', 'B3', 'Retro Classic (B3)')">Retro Classic (B3)</div>
+                                    <div class="dropdown-item" onclick="selectItem('beep', 'B8', 'Alert Style (B8)')">Alert Style (B8)</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -121,20 +122,18 @@
             <div class="lg:col-span-6">
                 <div class="terminal rounded-[2.5rem] p-8 h-full flex flex-col shadow-2xl border border-cyan-900/30">
                     <div class="flex justify-between items-center mb-6 px-2 text-cyan-400">
-                        <span class="text-[10px] font-black flex items-center gap-3 tracking-[0.2em]">
+                        <span class="text-[10px] font-black flex items-center gap-3 tracking-widest uppercase">
                             <span class="w-2 h-2 rounded-full bg-cyan-500 animate-pulse"></span> MONITORING
                         </span>
-                        <button onclick="clearLog()" class="text-[10px] text-slate-600 hover:text-white uppercase font-black transition-colors">Clear</button>
+                        <button onclick="clearLog()" class="text-[9px] text-slate-600 hover:text-white uppercase font-black">Clear Log</button>
                     </div>
-                    
-                    <div id="serial-log" class="flex-grow font-mono text-[11px] leading-relaxed text-cyan-500/80 overflow-y-auto mb-8 p-4 min-h-[400px] bg-slate-950/50 rounded-2xl border border-slate-900">
+                    <div id="serial-log" class="flex-grow font-mono text-[10px] leading-relaxed text-cyan-500/80 overflow-y-auto mb-8 p-4 min-h-[400px] bg-slate-950/50 rounded-2xl border border-slate-900 shadow-inner">
                         > Chờ kết nối thiết bị...
                     </div>
-
                     <div class="flex gap-3 bg-slate-900/50 p-3 rounded-2xl border border-slate-800">
-                        <input type="text" id="manual-cmd" placeholder="Lệnh tay (VD: U2)..." class="flex-grow bg-transparent px-4 py-2 text-xs text-white outline-none">
-                        <button onclick="sendManual()" class="bg-cyan-600 p-3 rounded-xl text-slate-950 hover:bg-cyan-400 transition-all active:scale-90 shadow-lg">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/></svg>
+                        <input type="text" id="manual-cmd" placeholder="Nhập lệnh tay..." class="flex-grow bg-transparent px-4 py-2 text-xs text-white outline-none">
+                        <button onclick="sendManual()" class="bg-cyan-600 p-3 rounded-xl text-slate-950 hover:bg-cyan-400 active:scale-90 transition-all shadow-lg shadow-cyan-900/20">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/></svg>
                         </button>
                     </div>
                 </div>
@@ -146,47 +145,36 @@
         let port;
         let reader;
 
-        function updateUIStatus(connected) {
-            const dot = document.getElementById('status-dot');
-            const text = document.getElementById('status-text');
-            const badge = document.getElementById('status-badge');
-            const btnText = document.getElementById('connect-btn-text');
-            
-            if (connected) {
-                dot.className = "w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_#10b981]";
-                text.textContent = "Connected";
-                text.className = "text-[10px] font-bold text-emerald-500 uppercase tracking-widest";
-                badge.className = "flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full";
-                btnText.textContent = "Device Connected";
-            } else {
-                dot.className = "w-2 h-2 rounded-full bg-red-500";
-                text.textContent = "Disconnected";
-                text.className = "text-[10px] font-bold text-red-500 uppercase tracking-widest";
-                badge.className = "flex items-center gap-2 px-3 py-1 bg-red-500/10 border border-red-500/20 rounded-full";
-                btnText.textContent = "Connect Serial Device";
-            }
+        function toggleDropdown(id) {
+            document.querySelectorAll('.dropdown-list').forEach(list => {
+                if (list.id !== id + '-list') list.classList.remove('active');
+            });
+            document.getElementById(id + '-list').classList.toggle('active');
+        }
+
+        async function selectItem(type, val, label) {
+            document.getElementById(type + '-text').innerText = label;
+            document.getElementById(type + '-list').classList.remove('active');
+            await sendCmd(val);
         }
 
         async function initSerial() {
             try {
                 port = await navigator.serial.requestPort();
                 await port.open({ baudRate: 115200 });
-                logToScreen("ĐÃ KẾT NỐI THÀNH CÔNG!", "sys");
+                logToScreen("ĐÃ KẾT NỐI!", "sys");
                 updateUIStatus(true);
                 startReading();
-            } catch (e) {
-                logToScreen("LỖI: Chưa chọn thiết bị.", "sys");
-                updateUIStatus(false);
-            }
+            } catch (e) { logToScreen("LỖI: Chưa chọn thiết bị.", "sys"); updateUIStatus(false); }
         }
 
         async function sendCmd(c) {
-            if (!port) { await initSerial(); }
+            if (!port) await initSerial();
             if (port && port.writable) {
                 const writer = port.writable.getWriter();
                 await writer.write(new TextEncoder().encode(c + "\n"));
                 writer.releaseLock();
-                logToScreen("GỬI: " + c, "cmd");
+                logToScreen("SEND: " + c, "cmd");
             }
         }
 
@@ -199,19 +187,32 @@
                         if (done) break;
                         logToScreen(new TextDecoder().decode(value), "serial");
                     }
-                } catch (e) { 
-                    updateUIStatus(false);
-                    port = null; break; 
-                } finally { reader.releaseLock(); }
+                } catch (e) { updateUIStatus(false); port = null; break; } finally { reader.releaseLock(); }
+            }
+        }
+
+        function updateUIStatus(connected) {
+            const dot = document.getElementById('status-dot');
+            const text = document.getElementById('status-text');
+            const badge = document.getElementById('status-badge');
+            if (connected) {
+                dot.className = "w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_#10b981]";
+                text.textContent = "Connected";
+                text.className = "text-[8px] font-bold text-emerald-500 uppercase tracking-widest";
+                badge.className = "flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full";
+            } else {
+                dot.className = "w-2 h-2 rounded-full bg-red-500";
+                text.textContent = "Disconnected";
+                text.className = "text-[8px] font-bold text-red-500 uppercase tracking-widest";
+                badge.className = "flex items-center gap-2 px-3 py-1 bg-red-500/10 border border-red-500/20 rounded-full";
             }
         }
 
         function logToScreen(msg, type) {
             const div = document.getElementById('serial-log');
             const line = document.createElement('div');
-            line.className = 'mb-1';
-            if (type === 'cmd') line.className += ' text-white font-bold';
-            if (type === 'sys') line.className += ' text-yellow-500 font-bold italic';
+            if (type === 'cmd') line.className = 'text-white font-bold';
+            if (type === 'sys') line.className = 'text-yellow-500 font-bold italic';
             line.textContent = `[${new Date().toLocaleTimeString()}] ${msg.trim()}`;
             div.appendChild(line);
             div.scrollTop = div.scrollHeight;
@@ -221,6 +222,12 @@
         function sendManual() {
             const input = document.getElementById('manual-cmd');
             if(input.value) { sendCmd(input.value); input.value = ''; }
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.closest('.custom-dropdown')) {
+                document.querySelectorAll('.dropdown-list').forEach(list => list.classList.remove('active'));
+            }
         }
     </script>
 </body>
