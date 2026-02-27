@@ -9,5 +9,6 @@
         { "path": "firmware.bin", "offset": 0 }
       ]
     }
-  ]
+  ],
+  "new_install_acknowledgement_prompt": "CẢNH BÁO: Hệ thống sẽ thực hiện XÓA SẠCH (ERASE) chip trước khi nạp firmware mới để đảm bảo tính ổn định. Bạn có đồng ý không?"
 }
