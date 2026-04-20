@@ -1,12 +1,12 @@
 {
   "name": "VietHud Project",
-  "version": "1.0.1",
+  "version": "2.0.2",
   "new_install_prompt_erase": false,
   "builds": [
     {
       "chipFamily": "ESP32",
       "parts": [
-        { "path": "Viethud_Ver201.bin", "offset": 0 }
+        { "path": "Viethud_Ver202.bin", "offset": 0 }
       ]
     }
   ],
