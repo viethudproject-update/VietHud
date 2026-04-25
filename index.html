@@ -118,6 +118,29 @@
                         <button onclick="sendFinal('beep')" class="btn-send">Gửi</button>
                     </div>
                 </div>
+
+                <div class="glass-card rounded-2xl p-6" style="z-index: 70;">
+                    <h3 class="text-cyan-400 font-bold text-sm mb-1 uppercase flex items-center gap-2">04. Bù trừ quá tốc độ</h3>
+                    <div class="flex items-center gap-4">
+                        <div class="custom-select-container">
+                            <div class="selected-box" onclick="toggleDrop('offset')">
+                                <span id="offset-label">Bù trừ 0 km/h (O0)</span>
+                                <i class="fas fa-chevron-down text-[10px]"></i>
+                            </div>
+                            <div class="options-list" id="offset-list">
+                                <div class="option-item" onclick="setVal('offset', 'O0', 'Bù trừ 0 km/h (O0)')">Không bù trừ (Mặc định)</div>
+                                <div class="option-item" onclick="setVal('offset', 'O1', 'Bù trừ +1 km/h (O1)')">Bù trừ +1 km/h</div>
+                                <div class="option-item" onclick="setVal('offset', 'O2', 'Bù trừ +2 km/h (O2)')">Bù trừ +2 km/h</div>
+                                <div class="option-item" onclick="setVal('offset', 'O3', 'Bù trừ +3 km/h (O3)')">Bù trừ +3 km/h</div>
+                                <div class="option-item" onclick="setVal('offset', 'O4', 'Bù trừ +4 km/h (O4)')">Bù trừ +4 km/h</div>
+                                <div class="option-item" onclick="setVal('offset', 'O5', 'Bù trừ +5 km/h (O5)')">Bù trừ +5 km/h</div>
+                                <div class="option-item" onclick="setVal('offset', 'O10', 'Bù trừ +10 km/h (O10)')">Bù trừ +10 km/h</div>
+                            </div>
+                        </div>
+                        <button onclick="sendFinal('offset')" class="btn-send">Gửi</button>
+                    </div>
+                    <p class="text-[9px] text-slate-500 mt-2 italic">* Giúp tránh hú còi khi chạy lố giới hạn một khoảng nhỏ.</p>
+                </div>
             </div>
 
             <div class="lg:col-span-5">
@@ -140,7 +163,7 @@
     </div>
 
     <script>
-        let port, reader, currentVals = { rot: '', ui: '', beep: 'B1' };
+        let port, reader, currentVals = { rot: '', ui: '', beep: 'B1', offset: 'O0' };
         let keepReading = true;
 
         function toggleDrop(id) {
@@ -184,13 +207,10 @@
             document.getElementById('log-placeholder').classList.remove('hidden');
         }
 
-        // AUTO PREPARE FLASH: Hủy kết nối script trước khi web-tools chạy
         async function prepareFlash(event) {
             if (port) {
-                // Ngăn chặn hành động mặc định một chút để ngắt kết nối đã
                 log(">>> HỆ THỐNG ĐANG TỰ ĐỘNG GIẢI PHÓNG CHIP ĐỂ NẠP...", "sys");
                 await disconnectSerial();
-                // Chờ 300ms để chip sẵn sàng nhận lệnh RTS/DTR từ trình installer
                 await new Promise(r => setTimeout(r, 300));
             }
         }
