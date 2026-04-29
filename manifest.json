@@ -6,7 +6,7 @@
     {
       "chipFamily": "ESP32",
       "parts": [
-        { "path": "Viethud_Ver202.bin", "offset": 0 }
+        { "path": "Viethud_Ver203.bin", "offset": 0 }
       ]
     }
   ],
