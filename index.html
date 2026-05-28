@@ -142,7 +142,47 @@
                     <p class="text-[9px] text-slate-500 mt-2 italic">* Giúp tránh hú còi khi chạy lố giới hạn một khoảng nhỏ.</p>
                 </div>
             </div>
+<div class="glass-card rounded-2xl p-6" style="z-index: 60;">
+    <h3 class="text-cyan-400 font-bold text-sm mb-1 uppercase flex items-center gap-2">
+        05. Logo khởi động
+    </h3>
 
+    <div class="flex items-center gap-4">
+        <div class="custom-select-container">
+            <div class="selected-box" onclick="toggleDrop('logo')">
+                <span id="logo-label">Chọn logo khởi động...</span>
+                <i class="fas fa-chevron-down text-[10px]"></i>
+            </div>
+
+            <div class="options-list" id="logo-list">
+                <div class="option-item" onclick="setVal('logo', 'L0', 'Navi')">Navi</div>
+                <div class="option-item" onclick="setVal('logo', 'L1', 'Audi')">Audi</div>
+                <div class="option-item" onclick="setVal('logo', 'L2', 'BMW')">BMW</div>
+                <div class="option-item" onclick="setVal('logo', 'L3', 'Chevrolet')">Chevrolet</div>
+                <div class="option-item" onclick="setVal('logo', 'L4', 'Ford')">Ford</div>
+                <div class="option-item" onclick="setVal('logo', 'L5', 'Honda')">Honda</div>
+                <div class="option-item" onclick="setVal('logo', 'L6', 'Honda Moto')">Honda Moto</div>
+                <div class="option-item" onclick="setVal('logo', 'L7', 'Hyundai')">Hyundai</div>
+                <div class="option-item" onclick="setVal('logo', 'L8', 'Kia')">Kia</div>
+                <div class="option-item" onclick="setVal('logo', 'L9', 'Land Rover')">Land Rover</div>
+                <div class="option-item" onclick="setVal('logo', 'L10', 'Lexus')">Lexus</div>
+                <div class="option-item" onclick="setVal('logo', 'L11', 'Mazda')">Mazda</div>
+                <div class="option-item" onclick="setVal('logo', 'L12', 'Mercedes')">Mercedes</div>
+                <div class="option-item" onclick="setVal('logo', 'L13', 'Mitsubishi')">Mitsubishi</div>
+                <div class="option-item" onclick="setVal('logo', 'L14', 'Nissan')">Nissan</div>
+                <div class="option-item" onclick="setVal('logo', 'L15', 'Peugeot')">Peugeot</div>
+                <div class="option-item" onclick="setVal('logo', 'L16', 'Porches')">Porches</div>
+                <div class="option-item" onclick="setVal('logo', 'L17', 'Subaru')">Subaru</div>
+                <div class="option-item" onclick="setVal('logo', 'L18', 'Suzuki')">Suzuki</div>
+                <div class="option-item" onclick="setVal('logo', 'L19', 'Toyota')">Toyota</div>
+                <div class="option-item" onclick="setVal('logo', 'L20', 'Vinfast')">Vinfast</div>
+                <div class="option-item" onclick="setVal('logo', 'L21', 'Volvo')">Volvo</div>
+            </div>
+        </div>
+
+        <button onclick="sendFinal('logo')" class="btn-send">Gửi</button>
+    </div>
+</div>
             <div class="lg:col-span-5">
                 <div class="glass-card rounded-2xl p-6 h-full flex flex-col border border-slate-800">
                     <div class="flex justify-between items-center mb-4 text-cyan-400 px-2 font-bold uppercase text-[10px]">
@@ -163,7 +203,7 @@
     </div>
 
     <script>
-        let port, reader, currentVals = { rot: '', ui: '', beep: 'B1', offset: 'O0' };
+        let port, reader, currentVals = { rot: '', ui: '', beep: 'B1', offset: 'O0', logo: 'L0' };
         let keepReading = true;
 
         function toggleDrop(id) {
